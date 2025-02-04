@@ -26,7 +26,6 @@ plt.legend()
 plt.title("Synthetic Data")
 plt.show()
 
-
 # Step 3: Generate a TensorFlow graph
 class LogisticRegression(tf.keras.Model):
     def __init__(self):
@@ -82,9 +81,77 @@ plt.scatter(x_np[predicted_classes.flatten() == 1, 0],
             x_np[predicted_classes.flatten() == 1, 1],
             label="Predicted Class 1", alpha=0.5, marker='x', color='red')
 
+# Highlight predicted class 0
+plt.scatter(x_np[predicted_classes.flatten() == 0, 0],
+            x_np[predicted_classes.flatten() == 0, 1],
+            label="Predicted Class 0", alpha=0.5, marker='x', color='black')
+
 plt.legend()
 plt.title("Predicted Outputs")
 plt.show()
+
+# Compute accuracy
+correct_predictions = np.sum(predicted_classes.flatten() == y_np)
+accuracy = correct_predictions / len(y_np)
+
+print(f"Model Accuracy: {accuracy:.2%}")
+
+#Generate more challenging synthetic data
+N = 100
+
+# Zeros form a Gaussian centered at (-0.2, -0.2) with smaller spread
+x_zeros = np.random.multivariate_normal(mean=np.array((-0.20, -0.20)), cov=0.05 * np.eye(2), size=(N // 2,))
+y_zeros = np.zeros((N // 2,))
+
+# Ones form a Gaussian centered at (0.2, 0.2) with smaller spread
+x_ones = np.random.multivariate_normal(mean=np.array((0.20, 0.20)), cov=0.05 * np.eye(2), size=(N // 2,))
+y_ones = np.ones((N // 2,))
+
+x_np = np.vstack([x_zeros, x_ones])
+y_np = np.concatenate([y_zeros, y_ones])
+
+
+# In[21]:
+
+
+# Plot x_zeros and x_ones on the same graph
+plt.scatter(x_zeros[:, 0], x_zeros[:, 1], label="Class 0", alpha=0.7)
+plt.scatter(x_ones[:, 0], x_ones[:, 1], label="Class 1", alpha=0.7)
+plt.legend()
+plt.title("Synthetic Data")
+plt.show()
+
+# Prepare dataset
+x_tensor = tf.convert_to_tensor(x_np, dtype=tf.float32)
+
+# Make predictions
+_, predicted_probs = model(x_tensor)
+predicted_classes = tf.round(predicted_probs).numpy()
+
+# Plot predictions
+plt.scatter(x_zeros[:, 0], x_zeros[:, 1], label="Class 0 (True)", alpha=0.7)
+plt.scatter(x_ones[:, 0], x_ones[:, 1], label="Class 1 (True)", alpha=0.7)
+
+# Highlight predicted class 1
+plt.scatter(x_np[predicted_classes.flatten() == 1, 0],
+            x_np[predicted_classes.flatten() == 1, 1],
+            label="Predicted Class 1", alpha=0.5, marker='x', color='red')
+
+# Highlight predicted class 0
+plt.scatter(x_np[predicted_classes.flatten() == 0, 0],
+            x_np[predicted_classes.flatten() == 0, 1],
+            label="Predicted Class 0", alpha=0.5, marker='x', color='black')
+
+plt.legend()
+plt.title("Predicted Outputs")
+plt.show()
+
+
+# Compute accuracy
+correct_predictions = np.sum(predicted_classes.flatten() == y_np)
+accuracy = correct_predictions / len(y_np)
+
+print(f"Model Accuracy: {accuracy:.2%}")
 
 
 
